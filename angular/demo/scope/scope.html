@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html ng-app>
+<head>
+    <title>Dependency Injection</title>
+</head>
+<body>
+    <ul ng-controller="ItemsController">
+        <li ng-repeat="item in items">{{ item }}</li>
+    </ul>
+     <script src="../../resources/angular.js"></script>
+    <script>
+        function ItemsController($scope){
+            $scope.items = [1,2,3];
+        }
+        angular.element(document).ready(function(){
+            var helloDiv = angular.element(document);
+            console.log(helloDiv.scope());
+        });
+        function helloController($scope){
+            $scope.name = "world";
+        }
+    </script>
+</body>
+</html>

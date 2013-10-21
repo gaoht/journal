@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Dependency Injection</title>
+</head>
+<body>
+    <div ng-app id="helloApp" ng-controller="helloController" ng-bind="name"></div>
+     <script src="angular.js"></script>
+     <!--<script src="test.js"></script>-->
+    <script>
+        angular.element(document).ready(function(){
+            var helloDiv = angular.element(document.getElementById("helloApp"));
+            var injector = helloDiv.injector();
+            console.log(injector.get("$rootScope"));
+        });
+
+
+        function helloController($scope){
+            $scope.name = "world";
+        }
+//        angular.bootstrap(document, []);
+//        var ng = angular.injector(["ng"]);
+//        console.log(ng.get("$compile"));
+//        var controller1 = ng.get("$controller");
+//        var controller2 = ng.get("$controller");
+//        alert(controller1 === controller2);
+//        ng = angular.injector(["ng"]);
+//        controller2 = ng.get("$controller");
+//        alert(controller1 === controller2);
+//        ng.invoke(function($rootScope){
+//            console.log($rootScope);
+//            var scope1 = $rootScope.$new();
+//            console.log(scope1);
+//            var scope2 = $rootScope.$new();
+//            console.log(scope2);
+//            var scope3 = $rootScope.$new(true);
+//            console.log(scope3);
+//            $rootScope.$watch("aaa");
+//        })
+    </script>
+</body>
+</html>

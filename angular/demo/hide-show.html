@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>Hide and Show</title>
+    <style type="text/css">
+        .menu-disabled-true{
+            color: gray;
+        }
+    </style>
+</head>
+<body ng-app>
+    <div ng-controller="DeathrayMenuController">
+        <button ng-click="toggleMenu()">Toggle Menu</button>
+        <ul ng-show="menuState.show">
+            <li ng-click="stun()" class="menu-disabled-{{isDisabled}}">Stun</li>
+            <li ng-click="disintegrate()">Disintegrate</li>
+            <li ng-click="erase()">Erase from history</li>
+        </ul>
+    </div>
+    <script src="../resources/angular.js"></script>
+    <script>
+        function DeathrayMenuController($scope){
+            $scope.isDisabled = false;
+            $scope.menuState = {};
+            $scope.menuState.show = false;
+            $scope.toggleMenu = function(){
+                $scope.menuState.show = !$scope.menuState.show;
+            }
+            $scope.stun = function(){
+                $scope.isDisabled = 'true';
+            }
+        }
+    </script>
+
+</body>
+</html>

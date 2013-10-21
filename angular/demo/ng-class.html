@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>ng-class</title>
+    <style>
+        .selected{
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body ng-app>
+    <table border="1" ng-controller="RestaurantTableController">
+        <tr ng-repeat="restaurant in directory" ng-click='selectRestaurant($index)' ng-class="{selected: $index == selectedRow}">
+            <td>{{restaurant.name}}</td>
+            <td>{{restaurant.cuisine}}</td>
+        </tr>
+    </table>
+    <script src="../resources/angular.js"></script>
+    <script>
+        function RestaurantTableController($scope){
+            $scope.directory = [
+                {name:"The Handsome Heifer", cuisine:"BBQ"},
+                {name:"Green's Green Greens", cuisine:'Salads'},
+                {name:'House of Fine Fish', cuisine:'Seafood'}
+            ];
+            $scope.selectRestaurant = function(row){
+                //this.selectedRow = row;
+                $scope.selectedRow = row;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<html>
+<head>
+    <title>Angular Form</title>
+</head>
+<body ng-app>
+    <form ng-submit="requestFunding()" ng-controller="StartUpController">
+        Starting: <input ng-model="startingEstimate">          <br>
+        Recommendation: {{needed}}                                                            <br>
+        <button>Fund my startup!</button><br>
+        <button ng-click="reset()" type="button">Reset</button>
+    </form>
+    <script src="../resources/angular.js"></script>
+    <script>
+        function StartUpController($scope){
+            console.log(arguments)
+            $scope.computeNeeded = function(){
+                $scope.needed = $scope.startingEstimate * 10;
+            }
+            $scope.$watch("startingEstimate", $scope.computeNeeded);
+            $scope.requestFunding = function(){
+                alert("Sorry, please get more customers first.");
+            }
+            $scope.reset = function(){
+                console.log(arguments)
+                $scope.startingEstimate = 0;
+            }
+        }
+    </script>
+</body>
+</html>

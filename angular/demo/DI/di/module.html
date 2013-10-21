@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <script src="services.js"></script>
+    <script src="injector.js"></script>
+    <script src="../angular.js"></script>
+    <script>
+        var engineer = angular.module("Engineer", []);
+        angular.module("Engineer").service("frontend", Frontend).service("backend", Backend);
+
+        function hookup(frontend, backend){
+            frontend.createUI();
+            backend.provideRestServices();
+            console.log("hook up");
+        }
+        var injector = angular.injector(["Engineer"]);
+        injector.invoke(hookup);
+
+        //when a injector is created, should not do provider/factory/...
+        engineer.provider("frontSide", function(){
+            return {
+                $get: function(){
+                    return new Frontend();
+                }
+            }
+//              this.$get = function(){
+//                  return new Frontend();
+//              }
+        })
+
+        engineer.factory("backSide", function(){
+            return new Backend();
+        })
+
+        engineer.value("front", new Frontend());
+
+        injector = angular.injector(["Engineer"]);
+        injector.get("frontSide").createUI();
+        injector.get("backSide").provideRestServices();
+        injector.get("front").createUI();
+
+        angular.module("Developer", [], function($provide){
+               $provide.provider("back", function(){
+                   this.log = function(msg){
+                       console.log(msg);
+                   };
+                   this.$get = function(){
+                       return new Backend();
+                   }
+               }).log("back service registered");
+        })
+
+        injector = angular.injector(["Developer"]);
+        injector.get("back").provideRestServices();
+    </script>
+</html>

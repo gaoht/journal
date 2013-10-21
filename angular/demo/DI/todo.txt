@@ -1,0 +1,114 @@
+1. 为什么要用$injector.initiate而不是invoke
+    module可以是一个class，而不仅仅是个简单的方法，所以加载module的时候，应该按类实例化方式处理
+2. provider, factory, service, value, constant的区别
+    provider,factory,value同属一类
+    service注册一个服务类的时候用，service会执行实例化
+3. providerInjector和instanceInjector的区别
+    providerInjector是configure信息
+    instanceInjector是configure工厂定义的$get信息
+4. 理解$compileProvider
+5. injector的闭包属性modules表是injector范围的，所以同一个injector下的多个同名服务会被覆盖
+6. 在工场创建中引用$provide也可以对外暴露服务，服务的作用范围是同一个injector，与定义module时调用provider是一样的
+7. 什么时候调用的compile
+    创建injector，即加载依赖模块：
+        1. ng
+        2. $provide
+        3. function($provide) {
+            $provide.value('$rootElement', element);
+            }
+        4. ng-app中指定的module
+    然后调用ng模块中的compile
+8. 为什么scope大都是从002开始的？
+    nextUid不是只有scope用的，例如创建injector时会有hashmap，加载依赖模块传入的是个对象如：
+    ['$provide', function($provide) {
+        $provide.value('$rootElement', element);
+    }]
+    hashmap就会先使用nextUid
+
+
+
+todo:
+1. rootScope中的digest遍历如何遍历的
+2. compile过程
+3. scope是怎么附上去的,数据时如何绑上去的
+4. 依赖的$injector的作用范围 是什么时候注入的
+
+
+
+
+同一节点上的directive为同一个nodeLinkFn
+
+
+
+bootstrap 1041
+$compileProvider 3976
+$rootScope
+
+
+
+1	Element
+2	Attribute
+3	Text
+4	CDATA Section
+5	Entity Reference
+6	Entity
+7	Processing Instrucion
+8	Comment
+9	Document
+10	Document Type
+11	Document Fragment
+12	Notation
+
+
+ service: invokeLater('$provide', 'service'),
+ value: invokeLater('$provide', 'value'),
+ constant: invokeLater('$provide', 'constant', 'unshift'),
+ filter: invokeLater('$filterProvider', 'register'),
+ controller: invokeLater('$controllerProvider', 'register'),
+ function invokeLater(provider, method, insertMethod) {
+          return function() {
+            invokeQueue[insertMethod || 'push']([provider, method, arguments]);
+            return moduleInstance;
+          }
+        }
+
+
+
+         a: htmlAnchorDirective,
+                    input: inputDirective,
+                    textarea: inputDirective,
+                    form: formDirective,
+                    script: scriptDirective,
+                    select: selectDirective,
+                    style: styleDirective,
+                    option: optionDirective,
+                    ngBind: ngBindDirective,
+                    ngBindHtmlUnsafe: ngBindHtmlUnsafeDirective,
+                    ngBindTemplate: ngBindTemplateDirective,
+                    ngClass: ngClassDirective,
+                    ngClassEven: ngClassEvenDirective,
+                    ngClassOdd: ngClassOddDirective,
+                    ngCsp: ngCspDirective,
+                    ngCloak: ngCloakDirective,
+                    ngController: ngControllerDirective,
+                    ngForm: ngFormDirective,
+                    ngHide: ngHideDirective,
+                    ngInclude: ngIncludeDirective,
+                    ngInit: ngInitDirective,
+                    ngNonBindable: ngNonBindableDirective,
+                    ngPluralize: ngPluralizeDirective,
+                    ngRepeat: ngRepeatDirective,
+                    ngShow: ngShowDirective,
+                    ngStyle: ngStyleDirective,
+                    ngSwitch: ngSwitchDirective,
+                    ngSwitchWhen: ngSwitchWhenDirective,
+                    ngSwitchDefault: ngSwitchDefaultDirective,
+                    ngOptions: ngOptionsDirective,
+                    ngView: ngViewDirective,
+                    ngTransclude: ngTranscludeDirective,
+                    ngModel: ngModelDirective,
+                    ngList: ngListDirective,
+                    ngChange: ngChangeDirective,
+                    required: requiredDirective,
+                    ngRequired: requiredDirective,
+                    ngValue: ngValueDirective

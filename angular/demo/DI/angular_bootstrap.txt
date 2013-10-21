@@ -1,0 +1,17 @@
+1. 加载jquery或者jQlite
+	  bindJQuery();
+2. 注册api
+	  publishExternalAPI(angular);
+	  预加载ng-locale
+	  预加载ng
+3. 加载ng-app
+	angularInit
+4. 启动
+	bootstrap
+		createInjector
+			load required modules
+				加载ng 需要依赖ng-locale，故先加载ng-locale
+				加载ng时编译directive
+			
+	
+	

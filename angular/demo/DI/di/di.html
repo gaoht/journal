@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <script src="services.js"></script>
+    <script src="injector.js"></script>
+    <script src="../angular.js"></script>
+    <script>
+    //////////////////////////////sample1//////////////////////////////
+        function Connector1(frontend, backend){
+            this.frontend = frontend;
+            this.backend = backend;
+        }
+        Connector1.prototype.hookup = function(){
+            var gui = this.frontend.createUI();
+            var service = this.backend.provideRestServices();
+            console.log("Hookup connected");
+        }
+        var frontend = new Frontend();
+        var backend = new Backend();
+        var connector = new Connector1(frontend, backend);
+        console.log("sample1");
+        connector.hookup();
+
+//////////////////////////////sample2//////////////////////////////
+        function Connector2(){
+    }
+    Connector2.prototype.hookup = function(frontend, backend){
+        var gui = frontend.createUI();
+        var service = backend.provideRestServices();
+        console.log("Hookup1 connected");
+    }
+    var frontend = new Frontend();
+    var backend = new Backend();
+    var connector = new Connector2();
+    console.log("sample2");
+    connector.hookup(frontend, backend);
+
+
+//////////////////////////////sample3//////////////////////////////
+        ///*****Law of Demeter***********///
+        var injector = createInjector([Frontend, Backend]);
+        var frontend = injector.get("frontend");
+        var backend = injector.get("backend");
+        var connector = new Connector1(frontend, backend);
+        console.log("sample3.1");
+        connector.hookup();
+
+
+        var frontend = injector.get("frontend");
+        var backend = injector.get("backend");
+        var connector = new Connector2();
+        console.log("sample3.2");
+        connector.hookup(frontend, backend);
+
+//////////////////////////////sample4//////////////////////////////
+        //Connector1.$inject = ["frontend", "backend"];
+        var connector = injector.instantiate(Connector1);
+        console.log("sample4.1");
+        connector.hookup();
+
+
+
+       // Connector2.prototype.hookup.$inject = ["frontend", "backend"];
+        var connector = new Connector2();
+        console.log("sample4.2");
+        injector.invoke(connector.hookup);
+
+    </script>
+</html>
