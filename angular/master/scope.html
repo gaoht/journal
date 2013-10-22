@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nested Scope</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+</head>
+<body ng-app ng-init="root = {'v0':'0000000000'}">
+    <input type="text" ng-model="root.v0"/>
+    <div ng-controller="controller1">
+        <input type="text" ng-model="v1"/>
+        <input type="text" ng-model="root.v0"/>
+        <div ng-controller="controller2">
+            <input type="text" ng-model="v2"/>
+            <input type="text" ng-model="v1"/>
+            <input type="text" ng-model="root.v0"/>
+            <div ng-controller="controller3">
+                <input type="text" ng-model="v3"/>
+                <input type="text" ng-model="v2"/>
+                <input type="text" ng-model="v1"/>
+                <input type="text" ng-model="root.v0"/>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div ng-controller="WorldCtrl">
+        <ul>
+            <li ng-repeat="country in countries">
+                {{ country.name }} has population of {{ country.population }},
+                {{worldsPercentage(country.population)}} % of the World's population
+            </li>
+        </ul>
+        World's population" {{ population }} millions
+    </div>
+    <script>
+        function controller1($scope){
+            $scope.v1 = "1111111111";
+            $scope.$on('$locationChangeSuccess', function(event, newUrl, oldUrl){
+                alert(newUrl)
+            });
+        }
+        function controller2($scope){
+            $scope.v2 = "2222222222";
+        }
+        function controller3($scope){
+            $scope.v3 = "3333333333";
+        }
+        function WorldCtrl($scope){
+            $scope.population = 7000;
+            $scope.countries = [
+                {name: 'France', population: 63.1},
+                {name: 'United Kingdom', population: 61.8},
+            ];
+            $scope.worldsPercentage = function (countryPopulation) {
+                return (countryPopulation / $scope.population)*100;
+            }
+        }
+        angular.element(document).ready(function(){
+            console.log(angular.element(document.body).scope())
+        })
+    </script>
+</body>
+</html>
