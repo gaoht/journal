@@ -1,0 +1,1 @@
+It contains accompanying automated tests

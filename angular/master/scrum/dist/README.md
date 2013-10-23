@@ -1,0 +1,1 @@
+It contains build results, ready to be deployed in a target environment

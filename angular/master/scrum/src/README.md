@@ -1,0 +1,1 @@
+It contains application's source code
