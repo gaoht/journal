@@ -1,0 +1,6 @@
+1. Build system principles:
+    1) Automate everything
+    2）Fail fast, fail clean
+        jshint check JavaScript errors
+    3）Different workflows, different commands
+    4) Build scripts are code too
