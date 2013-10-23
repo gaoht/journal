@@ -2,7 +2,14 @@
     module可以是一个class，而不仅仅是个简单的方法，所以加载module的时候，应该按类实例化方式处理
 2. provider, factory, service, value, constant的区别
     provider,factory,value同属一类
-    service注册一个服务类的时候用，service会执行实例化
+    service注册一个服务类的时候用，service会首先执行实例化即对provider中的$get属性进行实例化
+    provider会对传入的function进行实例化，this.$get或者return{$get: xxxx}都可
+    provider不会对$get属性进行实例化，所以只能{$get: function(){return object}}
+
+    不能在injector中调用provide，provide。只在module定义或者调用module的service定义方法provider/factory有效
+    provide在module上调用时是通过loadModules方法provider[invokeArgs[1]].apply(provider, invokeArgs[2])
+    来实现的，而依赖的服务都是从instanceCache中获取的，providerSuffix后缀，执行时invoke方法
+
 3. providerInjector和instanceInjector的区别
     providerInjector是configure信息
     instanceInjector是configure工厂定义的$get信息
