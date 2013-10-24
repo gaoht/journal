@@ -3,8 +3,65 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Angular Module</title>
+    <script src="../resources/angular/angular.js"></script>
 </head>
 <body>
-
+    <h1>理解provider 和 run</h1>
+    <script>
+//        angular.module("ConfigTestModule", []).provider("greet", function(){
+//            var name = "Jim Green";
+//            this.setName = function(n){
+//                name = n;
+//            }
+//            this.$get = function(){
+//                return function(){
+//                    alert(name);
+//                }
+//            }
+//        })
+//        var injector =  angular.injector(["ConfigTestModule"]);
+//        injector.invoke(function(greet){
+//            greet();
+//        })
+//        angular.module("ConfigTestModule").config(function(greetProvider){
+//            greetProvider.setName("LiLei");
+//        })
+//        injector.invoke(function(greet){
+//            greet();
+//        })
+//        var injector =  angular.injector(["ConfigTestModule"]);
+//        injector.invoke(function(greet){
+//            greet();
+//        })
+        var uApp = angular.module("upTimeApp", []);
+        uApp.factory("recorder", function(){
+            var time;
+            return {
+                set: function(){
+                    time = new Date();
+                    console.log("setting time: "+ time)
+                },
+                get: function(){
+                    return time;
+                }
+            }
+        })
+        uApp.run(function(recorder){
+            recorder.set();
+        })
+        console.log("Start loading upTimeApp"+ new Date());
+        injector =  angular.injector(["upTimeApp"]);
+        injector.invoke(function(recorder){
+            console.log(recorder.get());
+        })
+        setTimeout(function(){
+            injector.invoke(function(recorder){
+                recorder.set();
+            })
+            injector.invoke(function(recorder){
+                console.log(recorder.get());
+            })
+        }, 2000)
+    </script>
 </body>
 </html>

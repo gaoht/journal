@@ -1,1 +1,1 @@
-<p style="color:red">Mastering Web Application Development with AngularJS learning demos</p>
+Mastering Web Application Development with AngularJS learning demos

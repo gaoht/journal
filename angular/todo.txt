@@ -5,18 +5,16 @@
     service注册一个服务类的时候用，service会首先执行实例化即对provider中的$get属性进行实例化
     provider会对传入的function进行实例化，this.$get或者return{$get: xxxx}都可
     provider不会对$get属性进行实例化，所以只能{$get: function(){return object}}
+    provider可以在module的config时，通过注入service名+Provider调用provider工厂对象的实例方法
 
     不能在injector中调用provide，provide。只在module定义或者调用module的service定义方法provider/factory有效
     provide在module上调用时是通过loadModules方法provider[invokeArgs[1]].apply(provider, invokeArgs[2])
     来实现的，而依赖的服务都是从instanceCache中获取的，providerSuffix后缀，执行时invoke方法
-
 3. providerInjector和instanceInjector的区别
-    providerInjector是configure信息
-    instanceInjector是configure工厂定义的$get信息
-4. 理解$compileProvider
-5. injector的闭包属性modules表是injector范围的，所以同一个injector下的多个同名服务会被覆盖
-6. 在工场创建中引用$provide也可以对外暴露服务，服务的作用范围是同一个injector，与定义module时调用provider是一样的
-7. 什么时候调用的compile
+    providerInjector是provider factory实例化对象
+    instanceInjector是调用provider factory实例化对象的$get方法
+4. injector的闭包属性modules表是injector范围的，所以同一个injector下的多个同名服务会被覆盖
+5. 什么时候调用的compile
     创建injector，即加载依赖模块：
         1. ng
         2. $provide
@@ -25,31 +23,27 @@
             }
         4. ng-app中指定的module
     然后调用ng模块中的compile
-8. 为什么scope大都是从002开始的？
+6. 为什么scope大都是从002开始的？
     nextUid不是只有scope用的，例如创建injector时会有hashmap，加载依赖模块传入的是个对象如：
     ['$provide', function($provide) {
         $provide.value('$rootElement', element);
     }]
     hashmap就会先使用nextUid
+7. 依赖的$injector的作用范围是什么时候注入的
+    $injector只能出现在module的config阶段 对module中的invokeQueue处理时注入的
+8. module的run
+    在module的run阶段，run方法是在injector加载该module的时候执行的，而不是需要时再去调用的$get工厂方法去创建的,相当于main函数
+TODOS:
+1. 理解$compileProvider,compile过程
+2. promise
+3. rootScope中的digest遍历如何遍历的
+4. scope是怎么附上去的,数据时如何绑上去的
 
-
-
-todo:
-1. rootScope中的digest遍历如何遍历的
-2. compile过程
-3. scope是怎么附上去的,数据时如何绑上去的
-4. 依赖的$injector的作用范围 是什么时候注入的
 
 
 
 
 同一节点上的directive为同一个nodeLinkFn
-
-
-
-bootstrap 1041
-$compileProvider 3976
-$rootScope
 
 
 
