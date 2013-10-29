@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Bootstrap</title>
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css"/>
+    <!--<script src="../resources/jquery/jquery-1.10.2.js"></script>-->
+    <!--<script src="../resources/bootstrap/js/bootstrap.js"></script>-->
+    <style>
+        .cotain{
+            font-size: 0px;
+            line-height: 20px;
+        }
+        .right{
+            border-radius: 0 4px 4px 0;
+            border: 1px solid #ccc;
+            height: 20px;
+            line-height: 20px;
+            font-size: 14px;
+            padding: 4px 6px;
+            margin: 0;
+            width: 156px;
+        }
+        .add-on{
+            width: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            display: inline-block;
+            height: 20px;
+            line-height: 20px;
+            font-size: 14px;
+            width: auto;
+            padding: 4px 5px;
+            margin-right: -1px;
+            vertical-align: bottom;
+        }
+        .eeeee{
+            background-image: url("../resources/bootstrap/img/glyphicons-halflings.png");
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+            background-position: -72px 0;
+            vertical-align: 40%;
+        }
+        .navi-test{
+            list-style: none;
+            padding: 0;
+            border-bottom: 1px solid #cccccc;
+            overflow: hidden;
+        }
+        .navi-test li{
+            float: left;
+            padding: 4px 8px;
+        }
+        .navi-test li a{
+            text-decoration: none;
+        }
+        .navi-active{
+            border: 1px solid #ccc;
+            margin-bottom: -1px;
+        }
+        .wrap{
+            /*height: auto !important;*/
+            max-height: 100%;
+            margin-bottom: -60px;
+            overflow: auto;
+        }
+        html, body{
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .footer{
+            height: 58px;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero-unit">
+    <h1>Ha ha ha</h1>
+    <p>
+        ddjdjdjdjidojfojo jwoiejiorjw  weoiejrfiowejro jowe
+        wer wieojr oiw
+    </p>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="#" class="btn btn-primary btn-large">Look at here</a>
+</div>
+
+    <div class="control-group text-center">
+        <label class="control-label" for="inputIcon">Email address</label>
+        <div class="controls">
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-envelope"></i></span>
+                <input class="span2" id="inputIcon" type="text">
+            </div>
+        </div>
+    </div>
+    <div class="cotain text-center">
+        <span class="add-on"><i class="eeeee"></i></span>
+        <input class="right">
+    </div>
+    <ul class="navi-test">
+        <li class="navi-active"><a href="#">1111</a></li>
+        <li><a href="#">2222</a></li>
+        <li><a href="#">3333</a></li>
+        <li><a href="#">4444</a></li>
+    </ul>
+    <ul class="breadcrumb">
+        <li><a href="#">Home</a> <span class="divider">/</span></li>
+        <li><a href="#">Library</a> <span class="divider">/</span></li>
+        <li class="active">Data</li>
+    </ul>
+</div>
+<div class="footer"></div>
+</body>
+</html>

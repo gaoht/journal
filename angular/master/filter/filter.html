@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Filter</title>
+    <script src="../../resources/angular/angular.js"></script>
+    <script src="filter.js"></script>
+</head>
+<body ng-app="FilterModule">
+    <ul ng-controller="RecordsController">
+        <li ng-repeat="record in records | pagination:3:10">{{ record }}</li>
+    </ul>
+</body>
+</html>

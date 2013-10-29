@@ -33,12 +33,13 @@
     $injector只能出现在module的config阶段 对module中的invokeQueue处理时注入的
 8. module的run
     在module的run阶段，run方法是在injector加载该module的时候执行的，而不是需要时再去调用的$get工厂方法去创建的,相当于main函数
+
 TODOS:
 1. 理解$compileProvider,compile过程
 2. promise
 3. rootScope中的digest遍历如何遍历的
 4. scope是怎么附上去的,数据时如何绑上去的
-
+5. Deffer中的evalAsync
 
 
 
