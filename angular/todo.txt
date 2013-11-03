@@ -40,6 +40,7 @@ TODOS:
 3. rootScope中的digest遍历如何遍历的
 4. scope是怎么附上去的,数据时如何绑上去的
 5. Deffer中的evalAsync
+6. $parsers和$formatters 用处
 
 
 

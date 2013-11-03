@@ -966,12 +966,6 @@ function encodeUriQuery(val, pctEncodeSpaces) {
    </doc:source>
  </doc:example>
  *
-/**
- * 初始化angularjs，加载angular环境
- * 只加载第一个ng-app，如果有多个ng-app需要使用bootstrap手动加载
- * @param element 初始化传入的是document 从根节点document寻找遍历ng-app
- * @param bootstrap 启动函数
- *
  */
 function angularInit(element, bootstrap) {
   var elements = [element],
@@ -983,7 +977,7 @@ function angularInit(element, bootstrap) {
   function append(element) {
     element && elements.push(element);
   }
-  //获取所有ng-app
+
   forEach(names, function(name) {
     names[name] = true;
     append(document.getElementById(name));
@@ -1032,12 +1026,6 @@ function angularInit(element, bootstrap) {
  * @param {Array<String|Function>=} modules an array of module declarations. See: {@link angular.module modules}
  * @returns {AUTO.$injector} Returns the newly created injector for this app.
  */
-    /**
-     * 启动angular环境，当有多个ng-app需要手动调用该函数加载该app的运行环境
-     * @param element ng-app的rootElement
-     * @param modules ng-app运行时需要加载的module
-     * @returns {*}
-     */
 function bootstrap(element, modules) {
   var doBootstrap = function() {
     element = jqLite(element);
@@ -1046,16 +1034,6 @@ function bootstrap(element, modules) {
       $provide.value('$rootElement', element);
     }]);
     modules.unshift('ng');
-      /**
-       * 创建injector，加载时需要加载的依赖模块：
-       * 1. ng
-       * 2. $provide
-       * 3. function($provide) {
-       *    $provide.value('$rootElement', element);
-       * }
-       * 4. ng-app中指定的module
-       * @type {*}
-       */
     var injector = createInjector(modules);
     injector.invoke(['$rootScope', '$rootElement', '$compile', '$injector',
        function(scope, element, compile, injector) {
@@ -1067,7 +1045,7 @@ function bootstrap(element, modules) {
     );
     return injector;
   };
-  //window.name中以NG_DEFER_BOOTSTRAP!开头可以使用 angular.resumeBootstrap手动启动
+
   var NG_DEFER_BOOTSTRAP = /^NG_DEFER_BOOTSTRAP!/;
 
   if (window && !NG_DEFER_BOOTSTRAP.test(window.name)) {
@@ -1167,20 +1145,7 @@ function getter(obj, path, bindFnToScope) {
  *
  * Interface for configuring angular {@link angular.module modules}.
  */
-    /**
-     * 构造angular.module方法
-     * module就是在闭包的modules中添加module name即使用module的name进行索引
-     * {
-     *      "moduleName": {
-     *          requires: [],
-     *          name: "moduleName",
-     *          provide: function(...){...}
-     *          ....
-     *      }
-     * }
-     * @param window
-     * @returns {*}
-     */
+
 function setupModuleLoader(window) {
 
   function ensure(obj, name, factory) {
@@ -1442,10 +1407,7 @@ var version = {
   codeName: 'bubble-burst'
 };
 
-    /**
-     * 对外注册api
-     * @param angular
-     */
+
 function publishExternalAPI(angular){
   extend(angular, {
     'bootstrap': bootstrap,
@@ -1484,7 +1446,8 @@ function publishExternalAPI(angular){
 
   angularModule('ng', ['ngLocale'], ['$provide',
     function ngModule($provide) {
-         $provide.provider('$compile', $CompileProvider).directive({
+      $provide.provider('$compile', $CompileProvider).
+        directive({
             a: htmlAnchorDirective,
             input: inputDirective,
             textarea: inputDirective,
@@ -2499,16 +2462,6 @@ var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
 var FN_ARG_SPLIT = /,/;
 var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-
-    /**
-     * 依赖注解方法
-     * @param fn
-     * 如果fn是个数组，即["serive1", "service2", function(service1, service2){}]，
-     *      则为fn添加$injector注解fn.$inject = ["serive1", "service2"];
-     * 如果fn是个function则分析其参数名如function(service1, service2)
-     *      则为fn添加$injector为fn.$inject = ["serive1", "service2"];
-     * @returns {*}
-     */
 function annotate(fn) {
   var $inject,
       fnText,
@@ -2529,7 +2482,6 @@ function annotate(fn) {
     }
   } else if (isArray(fn)) {
     last = fn.length - 1;
-    //断言fn是否为function
     assertArgFn(fn[last], 'fn');
     $inject = fn.slice(0, last);
   } else {
@@ -2866,9 +2818,6 @@ function createInjector(modulesToLoad) {
       providerSuffix = 'Provider',
       path = [],
       loadedModules = new HashMap(),
-      /**
-       * 初始化provider服务
-       */
       providerCache = {
         $provide: {
             provider: supportObject(provider),
@@ -2879,28 +2828,16 @@ function createInjector(modulesToLoad) {
             decorator: decorator
           }
       },
-      /**
-       * 创建一个provider注射器
-       * 初始化时提供provider的基本方法 用于初始化module的方法
-       * provider时传的服务构造工厂保存在里面以供后面调用时使用
-       */
       providerInjector = createInternalInjector(providerCache, function() {
         throw Error("Unknown provider: " + path.join(' <- '));
       }),
       instanceCache = {},
-      /**
-       * 实例化注射器
-       * 从provider注射器中获取到服务构造工厂，将调用返回服务构造函数中$get函数，返回对外提供服务
-       * @type {*}
-       */
-      instanceInjector = (
-          instanceCache.$injector =
-          createInternalInjector(instanceCache,
-              function(servicename) {
-                    var provider = providerInjector.get(servicename + providerSuffix);
-                    return instanceInjector.invoke(provider.$get, provider);
-            }
-          ));
+      instanceInjector = (instanceCache.$injector =
+          createInternalInjector(instanceCache, function(servicename) {
+            var provider = providerInjector.get(servicename + providerSuffix);
+            return instanceInjector.invoke(provider.$get, provider);
+          }));
+
 
   forEach(loadModules(modulesToLoad), function(fn) { instanceInjector.invoke(fn || noop); });
 
@@ -2909,11 +2846,7 @@ function createInjector(modulesToLoad) {
   ////////////////////////////////////
   // $provider
   ////////////////////////////////////
-    /**
-     * 使delegate可以接受object，如果delegate调用时参数为object，则使用forEach多次调用
-     * @param delegate
-     * @returns {Function}
-     */
+
   function supportObject(delegate) {
     return function(key, value) {
       if (isObject(key)) {
@@ -2924,16 +2857,6 @@ function createInjector(modulesToLoad) {
     }
   }
 
-    /**
-     * 用于对外提供service
-     * @param name
-     * @param provider_  {function || array || object}
-     *  为function时 该函数构造并调用function，将执行返回对象作为服务注册到缓存中
-     *  为array时，同function，不过是指明了调用
-     *  function和array都必须返回包含$get工厂定义方法
-     *  为object，必须包含$get 工厂定义方法
-     * @returns {*}
-     */
   function provider(name, provider_) {
     if (isFunction(provider_) || isArray(provider_)) {
       provider_ = providerInjector.instantiate(provider_);
@@ -2944,20 +2867,8 @@ function createInjector(modulesToLoad) {
     return providerCache[name + providerSuffix] = provider_;
   }
 
-    /**
-     * provider的快捷方法 只接受function该方法为服务的工厂定义方法
-     * @param name
-     * @param factoryFn
-     * @returns {*}
-     */
   function factory(name, factoryFn) { return provider(name, { $get: factoryFn }); }
 
-    /**
-     *
-     * @param name
-     * @param constructor
-     * @returns {*}
-     */
   function service(name, constructor) {
     return factory(name, ['$injector', function($injector) {
       return $injector.instantiate(constructor);
@@ -2984,12 +2895,6 @@ function createInjector(modulesToLoad) {
   ////////////////////////////////////
   // Module Loading
   ////////////////////////////////////
-    /**
-     * 模块加载器
-     * 顺序加载各个模块，并且调用之前预加载(定义angular.module)时注册的服务
-      * @param modulesToLoad
-     * @returns {Array}
-     */
   function loadModules(modulesToLoad){
     var runBlocks = [];
     forEach(modulesToLoad, function(module) {
@@ -3038,18 +2943,14 @@ function createInjector(modulesToLoad) {
   ////////////////////////////////////
 
   function createInternalInjector(cache, factory) {
-      /**
-       * 获取服务，服务会缓存到cache中，如果cache中没有则调用factory构建该服务
-       * @param serviceName
-       * @returns {*}
-       */
+
     function getService(serviceName) {
       if (typeof serviceName !== 'string') {
         throw Error('Service name expected');
       }
       if (cache.hasOwnProperty(serviceName)) {
         if (cache[serviceName] === INSTANTIATING) {
-          throw Error('Circular dependency: ' + path.join(' <- '));ccc
+          throw Error('Circular dependency: ' + path.join(' <- '));
         }
         return cache[serviceName];
       } else {
@@ -3063,15 +2964,6 @@ function createInjector(modulesToLoad) {
       }
     }
 
-      /**
-       * 调用指定的fn
-       * 注解该fn的inject依赖，将依赖的服务作为参数传入fn
-       * @param fn  {Array|function}
-       *    依赖数组或者为function
-       * @param self context，如果不指定则为依赖的第一个服务
-       * @param locals 本地即local context，获取服务时将从local中先获取
-       * @returns {*}
-       */
     function invoke(fn, self, locals){
       var args = [],
           $inject = annotate(fn),
@@ -3093,7 +2985,6 @@ function createInjector(modulesToLoad) {
 
 
       // Performance optimization: http://jsperf.com/apply-vs-call-vs-invoke
-      //如果显示指定每个参数可以调高性能
       switch (self ? -1 : args.length) {
         case  0: return fn();
         case  1: return fn(args[0]);
@@ -3110,14 +3001,6 @@ function createInjector(modulesToLoad) {
       }
     }
 
-      /**
-       * 实例化一个服务，创建一个function对象调用invoke
-       * @param Type
-       * 注解形式参数["service1", "service2"..., function(){}]
-       * 非注解形式function(service1, service2){}
-       * @param locals
-       * @returns {*}
-       */
     function instantiate(Type, locals) {
       var Constructor = function() {},
           instance, returnedValue;
@@ -3998,14 +3881,6 @@ function $CompileProvider($provide) {
    *                info.
    * @returns {ng.$compileProvider} Self for chaining.
    */
-    /**
-     * 注册directive
-     * 缓存directive的factory
-     * module.directive就是调用该方法注册factory
-     * @param name
-     * @param directiveFactory
-     * @returns {$CompileProvider}
-     */
    this.directive = function registerDirective(name, directiveFactory) {
     if (isString(name)) {
       assertArg(directiveFactory, 'directive');
@@ -4333,21 +4208,6 @@ function $CompileProvider($provide) {
      * @param attrs The shared attrs object which is used to populate the normalized attributes.
      * @param {number=} maxPriority Max directive priority.
      */
-        /**
-         * 遍历返回节点上的directives, 结果按照优先级排序
-         * 该节点是
-         *   element ：
-         *      首先确实节点名称是不是directive，如果是则加入到directives
-         *      然后遍历其属性是否包含directive 如果包含则也加入到directives（其中也会加入{{}}这样的directive）
-         *   text:
-         *      判断{{}}加入到directives中
-         *
-         * @param node
-         * @param directives
-         * @param attrs
-         * @param maxPriority
-         * @returns {*}
-         */
     function collectDirectives(node, directives, attrs, maxPriority) {
       var nodeType = node.nodeType,
           attrsMap = attrs.$attr,
@@ -4743,14 +4603,6 @@ function $CompileProvider($provide) {
      *   * `M`: comment
      * @returns true if directive was added.
      */
-        /**
-         *
-         * @param tDirectives
-         * @param name
-         * @param location
-         * @param maxPriority
-         * @returns {boolean}
-         */
     function addDirective(tDirectives, name, location, maxPriority) {
       var match = false;
       if (hasDirectives.hasOwnProperty(name)) {
@@ -7900,13 +7752,7 @@ function $RouteParamsProvider() {
  * All other scopes are child scopes of the root scope. Scopes provide mechanism for watching the model and provide
  * event processing life-cycle. See {@link guide/scope developer guide on scopes}.
  */
-/**
- * $rootScope服务定义函数
- */
 function $RootScopeProvider(){
-    /**
-     * digest dirty check时的遍历深度
-     */
   var TTL = 10;
 
   this.digestTtl = function(value) {
@@ -7976,10 +7822,6 @@ function $RootScopeProvider(){
      * @returns {Object} Newly created scope.
      *
      */
-      /**
-       * scope构造函数
-       * @constructor
-       */
     function Scope() {
       this.$id = nextUid();
       this.$$phase = this.$parent = this.$$watchers =
@@ -8027,15 +7869,6 @@ function $RootScopeProvider(){
        * @returns {Object} The newly created child scope.
        *
        */
-        /**
-         * 创建一个新的scope 构造一个scope链
-         * 父scope保存子scope链的链头，链尾。每个子scope保存上一个节点scope和下一个节点scope
-         * 这样就可以通过父scope遍历子scope
-         * @param isolate 是否为独立上下文的scope
-         * true 将可以继承父scope的属性
-         * false 则重新创建一个scope
-         * @returns {*}
-         */
       $new: function(isolate) {
         var Child,
             child;
@@ -8144,16 +7977,6 @@ function $RootScopeProvider(){
        * @param {boolean=} objectEquality Compare object for equality rather than for reference.
        * @returns {function()} Returns a deregistration function for this listener.
        */
-        /**
-         * 注册监听
-         * 创建监听时 会为每个watcher对象添加一个last属性值为一个空的function(){}
-         * 用于保存上次修改后的结果
-         *
-         * @param watchExp
-         * @param listener
-         * @param objectEquality
-         * @returns {Function} 返回移除监听引用
-         */
       $watch: function(watchExp, listener, objectEquality) {
         var scope = this,
             get = compileToFn(watchExp, 'watch'),
@@ -8232,12 +8055,6 @@ function $RootScopeProvider(){
        * </pre>
        *
        */
-        /**
-         * dirty check
-         * 首先执行计算异步队列中的表达式
-         * 遍历当下scope上的watcher，如果changed是true，则继续遍历scope的子节点（深度优先遍历）
-         *
-         */
       $digest: function() {
         var watch, value, last,
             watchers,
@@ -8351,11 +8168,6 @@ function $RootScopeProvider(){
        * Note that, in AngularJS, there is also a `$destroy` jQuery event, which can be used to
        * clean up DOM bindings before an element is removed from the DOM.
        */
-        /**
-         * 销毁scope
-         * 广播销毁消息
-         * 从父scope中移除该scope
-         */
       $destroy: function() {
         // we can't destroy the root scope or a scope that has been already destroyed
         if ($rootScope == this || this.$$destroyed) return;
@@ -8402,13 +8214,6 @@ function $RootScopeProvider(){
        *
        * @returns {*} The result of evaluating the expression.
        */
-        /**
-         * eval用于计算表达式的值
-         * 如果表达式非法则会抛出异常 需要捕获
-         * @param expr
-         * @param locals
-         * @returns {*}
-         */
       $eval: function(expr, locals) {
         return $parse(expr)(this, locals);
       },
@@ -8437,10 +8242,6 @@ function $RootScopeProvider(){
        *    - `function(scope)`: execute the function with the current `scope` parameter.
        *
        */
-        /**
-         * 将表达式放入异步处理队列 以待某个时间或者事件从队列中获取并处理
-         * @param expr
-         */
       $evalAsync: function(expr) {
         this.$$asyncQueue.push(expr);
       },
@@ -8491,13 +8292,6 @@ function $RootScopeProvider(){
        *
        * @returns {*} The result of evaluating the expression.
        */
-        /**
-         * 传入一个表达式
-         * 表达式错误会被捕获
-         * 最后调用$digest dirty check scope chain
-         * @param expr
-         * @returns {*}
-         */
       $apply: function(expr) {
         try {
           beginPhase('$apply');
@@ -15354,10 +15148,11 @@ var styleDirective = valueFn({
   //but we will rebind on bootstrap again.
   bindJQuery();
 
- publishExternalAPI(angular);
+  publishExternalAPI(angular);
 
   jqLite(document).ready(function() {
     angularInit(document, bootstrap);
   });
+
 })(window, document);
 angular.element(document).find('head').append('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak{display:none !important;}ng\\:form{display:block;}</style>');
