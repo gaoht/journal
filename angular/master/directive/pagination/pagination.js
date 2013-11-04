@@ -1,14 +1,19 @@
-angular.module("pagination-directive", []).directive("pagination", function(){
+angular.module("directives", []).directive("pagination", function(){
     return {
         restrict: "E",
         scope: {
             numPages: "@",
-            currentPage: "@"
+            currentPage: "@",
+            onSelectPage: "&"
         },
-        templateUrl: "pagination.tpl.html",
+        template: '<div class="pagination"><ul>' +
+            '<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>' +
+            '<li ng-repeat="page in pages" ng-class="{active: isActive(page)}"><a ng-click="selectPage(page)">{{page}}</a></li>' +
+            '<li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>' +
+            '</ul>' +
+            '</div>',
         replace: true,
         link: function(scope){
-            console.log(scope);
             scope.$watch('numPages', function(value){
                 var pages = scope.pages = [];
                 for(var i=1; i<=value; i++){
@@ -24,6 +29,7 @@ angular.module("pagination-directive", []).directive("pagination", function(){
             scope.selectPage = function(page){
                 if(!scope.isActive(page)){
                     scope.currentPage = page;
+                    scope.onSelectPage({ page: page });
                 }
             }
             scope.noNext = function(){
@@ -34,12 +40,12 @@ angular.module("pagination-directive", []).directive("pagination", function(){
             }
             scope.selectNext = function(){
                 if(!scope.noNext()){
-                    scope.currentPage++;
+                    scope.selectPage(parseInt(scope.currentPage) + 1);
                 }
             }
             scope.selectPrevious = function(){
                 if(!scope.noPrevious()){
-                    scope.currentPage--;
+                    scope.selectPage(parseInt(scope.currentPage) - 1);
                 }
             }
         }

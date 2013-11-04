@@ -1,20 +1,19 @@
-describe("Pagination directive", function(){
+describe("directives", function(){
     var $scope,element, lis;
     beforeEach(module("directives"));
     beforeEach(inject(function($compile, $rootScope){
-        $scope = $rootScope.$new();
+        $scope = $rootScope;
         $scope.numPages = 5;
         $scope.currentPage = 3;
-        element = $compile('<pagination num-pages="numPages" currentpage="currentPage"></pagination>')($scope);
+        $scope.selectPageHandler = jasmine.createSpy('selectPageHandler');
+        element = $compile('<pagination num-pages="{{numPages}}" current-page="{{currentPage}}" on-select-page="selectPageHandler(page)"></pagination>')($scope);
         $scope.$digest();
-        lis = function(){
-            return element.find('li');
-        }
+        lis = function(){ return element.find('li'); }
     }));
     it('has the number of the page as text in each page item',
         function() {
             for(var i=1; i<=$scope.numPages;i++) {
-                expect(lis().eq(i).text()).toEqual(''+i);
+              expect(lis().eq(i).text()).toEqual(''+i);
             }
     });
     it('sets the current-page to be active', function() {
@@ -40,18 +39,24 @@ describe("Pagination directive", function(){
         expect($scope.currentPage).toBe(3);
     })
     it("click next current-page will turn to next", function(){
-        $.currentPage = 1;
+        $scope.currentPage = 1;
         $scope.$digest();
         var nextPageItem = lis().eq(-1).find("a").eq(0);
         nextPageItem.click();
         expect(lis().eq(2).hasClass("active")).toBe(true);
     })
     it("click previous current-page will turn to previous", function(){
-        $.currentPage = 2;
+        $scope.currentPage = 2;
         $scope.$digest();
-        var nextPageItem = lis().eq(0).find("a").eq(0);
-        nextPageItem.click();
+        var prevPageItem = lis().eq(0).find("a").eq(0);
+        prevPageItem.click();
+        $scope.$digest();
         expect(lis().eq(1).hasClass("active")).toBe(true);
     })
-    //...
+    it('executes the onSelectPage expression when the current page changes', (function() {
+        var page2 = element.find('li').eq(2).find('a').eq(0);
+        page2.click();
+        $scope.$digest();
+        expect($scope.selectPageHandler).toHaveBeenCalledWith(2);
+    }));
 })

@@ -40,8 +40,8 @@ TODOS:
 3. rootScope中的digest遍历如何遍历的
 4. scope是怎么附上去的,数据时如何绑上去的
 5. Deffer中的evalAsync
-6. $parsers和$formatters 用处
-
+6. $parsers和$formatters 用处(展现和保存的互相转换)
+7. 理解ng-repeat为什么会有compile
 
 
 

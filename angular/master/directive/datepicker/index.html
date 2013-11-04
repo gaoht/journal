@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Data Picker</title>
+    <link rel="stylesheet" href="../../../resources/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css"/>
+    <script src="../../../resources/jquery/jquery-1.10.2.js"></script>
+    <script src="../../../resources/jquery-ui/js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="../../../resources/angular/angular.js"></script>
+    <script src="datepicker.js"></script>
+</head>
+<body ng-app="directives" ng-controller="bodyCtrl">
+    <input type="text" date-picker="config" ng-model="x"/>
+    <input type="text" ng-model="x"/>
+    <script>
+        function bodyCtrl($scope){
+            $scope.config = {};
+            $scope.config.onSelect = function(dateStr){
+                alert(dateStr);
+            }
+        }
+    </script>
+ </body>
+</html>

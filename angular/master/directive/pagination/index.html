@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="pagination-directive">
+<html ng-app="directives">
 <head>
     <meta charset="utf-8">
     <title>Pagination</title>
@@ -7,7 +7,21 @@
     <link href="../../../resources/bootstrap/css/bootstrap.css" rel="stylesheet">
     <script src="pagination.js"></script>
 </head>
-<body >
-    <pagination num-pages="5" current-page="3"></pagination>
+<body ng-controller="bodyCtrl">
+    <pagination num-pages="{{page.numPages}}" current-page="{{page.currentPage}}" on-select-page="selectPageHandler(page)"></pagination>
+    <div>Number of Pages: <input ng-model="page.numPages" type="number"></div>
+    <div>Current Page: <input ng-model="page.currentPage"  type="number"></div>
+    <div>Count of Page Selections: {{selectCount}}</div>
+<script>
+    function bodyCtrl($scope){
+        var page = $scope.page = {};
+        page.currentPage = 3;
+        page.numPages = 5;
+        $scope.selectCount = 0;
+        $scope.selectPageHandler = function(page){
+            $scope.selectCount++;
+        }
+    }
+</script>
 </body>
 </html>

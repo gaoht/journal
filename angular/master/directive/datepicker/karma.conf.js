@@ -15,10 +15,11 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         "../../../resources/jquery/jquery-1.10.2.js",
+        "../../../resources/jquery-ui/js/jquery-ui-1.10.3.custom.js",
         "../../../resources/angular/angular.js",
         "../../../resources/angular/angular-mocks.js",
-        "pagination.js",
-        "pagination.spec.js"
+        "datepicker.js",
+        "datepicker.spec.js"
     ],
 
 
