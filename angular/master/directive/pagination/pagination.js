@@ -2,8 +2,8 @@ angular.module("directives", []).directive("pagination", function(){
     return {
         restrict: "E",
         scope: {
-            numPages: "=",
-            currentPage: "@",
+            numPages: "@",
+            currentPage: "=",
             onSelectPage: "&"
         },
         template: '<div class="pagination"><ul>' +
@@ -55,8 +55,8 @@ angular.module("directives1", []).directive("pagination", function(){
     return {
         restrict: "E",
         scope: {
-            numPages: "=",
-            currentPage: "@",
+            numPages: "@",
+            currentPage: "=",
             onSelectPage: "&"
         },
         template: '<div class="pagination"><ul>' +
