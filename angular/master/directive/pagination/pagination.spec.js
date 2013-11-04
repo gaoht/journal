@@ -1,12 +1,12 @@
 describe("directives", function(){
     var $scope,element, lis;
-    beforeEach(module("directives"));
+    beforeEach(module("directives1"));
     beforeEach(inject(function($compile, $rootScope){
         $scope = $rootScope;
         $scope.numPages = 5;
         $scope.currentPage = 3;
         $scope.selectPageHandler = jasmine.createSpy('selectPageHandler');
-        element = $compile('<pagination num-pages="{{numPages}}" current-page="{{currentPage}}" on-select-page="selectPageHandler(page)"></pagination>')($scope);
+        element = $compile('<pagination num-pages="numPages" current-page="{{currentPage}}" on-select-page="selectPageHandler(page)"></pagination>')($scope);
         $scope.$digest();
         lis = function(){ return element.find('li'); }
     }));

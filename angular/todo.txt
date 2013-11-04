@@ -33,7 +33,10 @@
     $injector只能出现在module的config阶段 对module中的invokeQueue处理时注入的
 8. module的run
     在module的run阶段，run方法是在injector加载该module的时候执行的，而不是需要时再去调用的$get工厂方法去创建的,相当于main函数
-
+9. transclude为时element为了保留原element所在的node添加了comment，这样link的时候element就是comment节点。
+10. directive定义时controller与link的区别
+    controller可以依赖注入，link则不行
+    controller和link的执行期不一样，controller的tranclsude是已经transclude好的scope，link只能通过compile的闭包属性transclude来transclude闭包
 TODOS:
 1. 理解$compileProvider,compile过程
 2. promise

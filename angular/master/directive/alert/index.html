@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>Alert</title>
+    <link rel="stylesheet" href="../../../resources/bootstrap/css/bootstrap.css"/>
+    <script src="../../../resources/angular/angular.js"></script>
+    <script src="alert.js"></script>
+</head>
+<body>
+    <!-- defines $rootScope -->
+    <div ng-app="directives" ng-init="type='success'">
+        <!-- bound to $rootScope -->
+        <div>{{type}}</div>
+        <input ng-model="type" type="text"/>
+        <!-- bound to $rootScope -->
+        <alert type="'info'">Look at {{type}}</alert>
+    </div>
+</body>
+</html>

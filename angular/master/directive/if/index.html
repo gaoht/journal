@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" ng-app="directives">
+<head>
+    <meta charset="UTF-8">
+    <title>If</title>
+    <link rel="stylesheet" href="../../../resources/bootstrap/css/bootstrap.css"/>
+    <script src="../../../resources/angular/angular.js"></script>
+    <script src="if.js"></script>
+</head>
+<body ng-controller="bodyCtrl">
+    <button ng-click="click()">
+        Toggle Div
+    </button>
+    <div if="model.show">
+        Shown {{model.count}} times
+    </div>
+    <script>
+        function bodyCtrl($scope){
+            $scope.model = {show: true, count: 0};
+            $scope.click = function(){
+                $scope.model.show = !$scope.model.show;
+                $scope.model.show && $scope.model.count++;
+            }
+        }
+    </script>
+</body>
+</html>
