@@ -45,7 +45,7 @@ angular.module('G11N', []).factory('Lang', function($http, $q){
                 loadLanguages(url, i, defer);
             });
         }else{
-            defer.resolve({});
+            defer.reject({});
         }
         return defer.promise;
     };

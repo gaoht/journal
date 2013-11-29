@@ -8,16 +8,22 @@
     <script src="language.js"></script>
 </head>
 <body ng-app="app">
+    <input type="text" ng-model="language">
+    <button ng-click="change()">Change</button>
     <div>
-        {{ loginPage.submit }} {{ mainPage.help }}
+        {{ localeBundle.loginPage.submit }} {{ localeBundle.mainPage.help }}{{ localeBundle.loginPage.psw }}
     </div>
     <script>
         angular.module('app', ['G11N']).run(['$rootScope', 'Lang', function($rootScope, Lang){
             Lang.loadLanguage('zh_CN').then(function(language){
-                angular.extend($rootScope, language);
-                console.log($rootScope);
+                $rootScope.localeBundle = language;
             });
-        }])
+            $rootScope.change = function(){
+                Lang.loadLanguage($rootScope.language).then(function(language){
+                    $rootScope.localeBundle = language;
+                });
+            }
+        }]);
     </script>
 </body>
 </html>
