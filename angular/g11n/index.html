@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Document</title>
+    <script src="../resources/angular/angular.js"></script>
+    <script src="../resources/jquery/jquery-1.10.2.js"></script>
+    <script src="language.js"></script>
+</head>
+<body ng-app="app">
+    <div>
+        {{ loginPage.submit }} {{ mainPage.help }}
+    </div>
+    <script>
+        angular.module('app', ['G11N']).run(['$rootScope', 'Lang', function($rootScope, Lang){
+            Lang.loadLanguage('zh_CN').then(function(language){
+                angular.extend($rootScope, language);
+                console.log($rootScope);
+            });
+        }])
+    </script>
+</body>
+</html>

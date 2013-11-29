@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Field</title>
+    <link rel="stylesheet" href="../../../resources/bootstrap/css/bootstrap.css"/>
+    <script src="../../../resources/angular/angular.js"></script>
+    <script src="field.js"></script>
+</head>
+<body>
+<field type="email" ng-model="user.email" required >
+    <label>Email</label>
+    <validator key="required">$fieldLabel is required</validator>
+    <validator key="email">Please enter a valid email</validator>
+</field>
+</body>
+</html>

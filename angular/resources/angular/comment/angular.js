@@ -3999,9 +3999,13 @@ function $CompileProvider($provide) {
    * @returns {ng.$compileProvider} Self for chaining.
    */
     /**
-     * 注册directive
+     * 注册directive并规范directive的config信息
      * 缓存directive的factory
      * module.directive就是调用该方法注册factory
+     * compile可以返回link函数或者一个对象包含preLink和postLink
+     * 如果返回link函数则为postLink
+     *
+     *
      * @param name
      * @param directiveFactory
      * @returns {$CompileProvider}
@@ -4187,7 +4191,13 @@ function $CompileProvider($provide) {
     return compile;
 
     //================================
-
+        /**
+         * 编译
+         * @param $compileNodes
+         * @param transcludeFn 第一次初始化时为undefined
+         * @param maxPriority
+         * @returns {Function}
+         */
     function compile($compileNodes, transcludeFn, maxPriority) {
       if (!($compileNodes instanceof jqLite)) {
         // jquery always rewraps, whereas we need to preserve the original selector so that we can modify it.
@@ -4200,7 +4210,9 @@ function $CompileProvider($provide) {
           $compileNodes[index] = jqLite(node).wrap('<span></span>').parent()[0];
         }
       });
+        debugger;
       var compositeLinkFn = compileNodes($compileNodes, transcludeFn, $compileNodes, maxPriority);
+
       return function publicLinkFn(scope, cloneConnectFn){
         assertArg(scope, 'scope');
         // important!!: we must call our jqLite.clone() since the jQuery one is trying to be smart
@@ -4293,6 +4305,11 @@ function $CompileProvider($provide) {
           childLinkFn = linkFns[i++];
 
           if (nodeLinkFn) {
+              /**
+               * link 阶段创建scope 如果false则直接使用父scope
+               * 如果为true则创建新的scope且继承父scope信息
+               * 如果为object则直接创建新的scope不继承父scope的信息
+               */
             if (nodeLinkFn.scope) {
               childScope = scope.$new(isObject(nodeLinkFn.scope));
               jqLite(node).data('$scope', childScope);
@@ -4302,6 +4319,10 @@ function $CompileProvider($provide) {
             childTranscludeFn = nodeLinkFn.transclude;
             if (childTranscludeFn || (!boundTranscludeFn && transcludeFn)) {
               nodeLinkFn(childLinkFn, childScope, node, $rootElement,
+                  /**
+                   * 如果设置了transclude就应该保留当前的scop信息 所以使用$new来创建一个父scope的继承scope
+                   * 并且当该transclude的节点destroy时同时需要销毁该scope
+                   */
                   (function(transcludeFn) {
                     return function(cloneFn) {
                       var transcludeScope = scope.$new();
@@ -4334,17 +4355,17 @@ function $CompileProvider($provide) {
      * @param {number=} maxPriority Max directive priority.
      */
         /**
-         * 遍历返回节点上的directives, 结果按照优先级排序
+         * 遍历返回给定节点上的directives, 结果按照优先级排序
          * 该节点是
          *   element ：
          *      首先确实节点名称是不是directive，如果是则加入到directives
          *      然后遍历其属性是否包含directive 如果包含则也加入到directives（其中也会加入{{}}这样的directive）
          *   text:
          *      判断{{}}加入到directives中
-         *
+         *   comment
          * @param node
-         * @param directives
-         * @param attrs
+         * @param (out) directives 将该节点上的directive存放在该数组中 按照priority排序
+         * @param (out) attrs 该节点所有的attributes
          * @param maxPriority
          * @returns {*}
          */
@@ -4374,6 +4395,7 @@ function $CompileProvider($provide) {
               if (getBooleanAttrName(node, nName)) {
                 attrs[nName] = true; // presence means true
               }
+              //如果值中有{{}}表达式 作为一个特殊的directive处理
               addAttrInterpolateDirective(node, directives, value, nName);
               addDirective(directives, nName, 'A', maxPriority);
             }
@@ -4430,6 +4452,23 @@ function $CompileProvider($provide) {
      *        argument has the root jqLite array so that we can replace nodes on it.
      * @returns linkFn
      */
+        /**
+         * 验证节点上的directive信息，执行相关操作具体可查看函数体内的详细注释
+         * 标记当前是否为isolated scope
+         * 标记当前与controller的directive
+         *  1. 不允许存在2个（包含）以上isolated scope在同一节点上
+         *  2. ？不允许存在2个相同的controller在同一节点上
+         *  3. 不允许有2个（包含）以上的directive设置transclude在同一节点上
+         *  4. 不允许有2个（包含）以上的directive设置template或者templateUrl在同一节点上
+         * @param directives 节点上的directive集合
+         * @param compileNode 当前编译的节点
+         * @param templateAttrs 该节点上的attrs
+         * （命名为templateAttr原因是该节点可以认为是个模版，如果设置了template，而且replace为true则可能会替换该节点
+         * 所以该节点可以认为是个html模版）
+         * @param transcludeFn
+         * @param jqCollection 第一次为$rootElement 用于template替换当前节点时（如果该节点没有父节点时可能是编译html片段时存在找不到父节点）用
+         * @returns {Function} 返回link function
+         */
     function applyDirectivesToNode(directives, compileNode, templateAttrs, transcludeFn, jqCollection) {
       var terminalPriority = -Number.MAX_VALUE,
           preLinkFns = [],
@@ -4455,7 +4494,11 @@ function $CompileProvider($provide) {
         if (terminalPriority > directive.priority) {
           break; // prevent further processing of directives
         }
-
+          /**
+           * 设置scope，如果scope为true或者object则为该element添加ng-scope class，如果为object同时添加ng-isolate-scope class
+           * 如果是object newIsolateScopeDirective设置为当前directive
+           * newScopeDirective为第一个设置为scope为isolated的directive
+           */
         if (directiveValue = directive.scope) {
           assertNoDuplicate('isolated scope', newIsolateScopeDirective, directive, $compileNode);
           if (isObject(directiveValue)) {
@@ -4467,14 +4510,25 @@ function $CompileProvider($provide) {
         }
 
         directiveName = directive.name;
-
+          /**
+           * 设置directive的controller
+           * controllerDirectives中保存了当前节点的所有设置了controller的directive
+           */
         if (directiveValue = directive.controller) {
           controllerDirectives = controllerDirectives || {};
           assertNoDuplicate("'" + directiveName + "' controller",
               controllerDirectives[directiveName], directive, $compileNode);
           controllerDirectives[directiveName] = directive;
         }
-
+          /**
+           * 设置directive的transclusion
+           * 如果设置了transclude则terminalPriority会被设置为当前directive的priority
+           * 每个节点只能有1个transclud为true或者element的directive
+           * 如果transclusion的值设置为element则会将当前节点替换为一个comment节点，并将当前节点作为模版编译
+           * 如果transclusion的值设置为非'element'且值为true则会将当前节点内容清空，并将当前节点的内容作为模版编译
+           * 编译后的结果保存在childTranscludeFn
+           * 这样在link阶段如果发现link函数上有transcludeFn则新创建一个scope继承其父scope 完成transclude的link工作
+           */
         if (directiveValue = directive.transclude) {
           assertNoDuplicate('transclusion', transcludeDirective, directive, $compileNode);
           transcludeDirective = directive;
@@ -4492,7 +4546,11 @@ function $CompileProvider($provide) {
             childTranscludeFn = compile($template, transcludeFn);
           }
         }
-
+          /**
+           * 每个节点上只能有1个带有template的directive
+           * 如果directive的replace设置为true 则替换当前节点并且将替换后的新节点上的directive放入directives中并合并attributes
+           * 如果replace未设置或者为false则将设置当前节点的html()为template并编译
+           */
         if ((directiveValue = directive.template)) {
           assertNoDuplicate('template', templateDirective, directive, $compileNode);
           templateDirective = directive;
@@ -4517,6 +4575,7 @@ function $CompileProvider($provide) {
             // - split it into two parts, those that were already applied and those that weren't
             // - collect directives from the template, add them to the second group and sort them
             // - append the second group with new directives to the first group
+
             directives = directives.concat(
                 collectDirectives(
                     compileNode,
@@ -4531,7 +4590,9 @@ function $CompileProvider($provide) {
             $compileNode.html(directiveValue);
           }
         }
-
+          /**
+           * 如果设置了templateUrl则不立即执行编译，在异步获取到template时再执行节点的compile
+           */
         if (directive.templateUrl) {
           assertNoDuplicate('template', templateDirective, directive, $compileNode);
           templateDirective = directive;
@@ -4539,7 +4600,11 @@ function $CompileProvider($provide) {
               nodeLinkFn, $compileNode, templateAttrs, jqCollection, directive.replace,
               childTranscludeFn);
           ii = directives.length;
-        } else if (directive.compile) {
+        }/**
+         *如果设置了compile但是没有设置templateUrl
+         *执行compile函数，将返回的link分别存放到preLink和postLinK数组中
+         */
+        else if (directive.compile) {
           try {
             linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
             if (isFunction(linkFn)) {
@@ -4551,19 +4616,23 @@ function $CompileProvider($provide) {
             $exceptionHandler(e, startingTag($compileNode));
           }
         }
-
+          /**
+           * 如果该directive设置了terminal，则terminalPriority设置为当前directive的priority
+           */
         if (directive.terminal) {
           nodeLinkFn.terminal = true;
           terminalPriority = Math.max(terminalPriority, directive.priority);
         }
 
       }
-
+            /**
+             * 标记scope和transclude的信息用于link阶段
+             */
       nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope;
       nodeLinkFn.transclude = transcludeDirective && childTranscludeFn;
 
       // might be normal or delayed nodeLinkFn depending on if templateUrl is present
-      return nodeLinkFn;
+      return  nodeLinkFn;
 
       ////////////////////
 
@@ -4578,7 +4647,15 @@ function $CompileProvider($provide) {
         }
       }
 
-
+        /**
+         * 获取依赖的controller
+         * 在link阶段如果该directive设置了controller
+         * 则注册实例化该controller，并会将该controller放到element的data缓存中
+         * 如果require设置的依赖controller为^则是现在本节点上查找该controller，如果没有则继续查找器父节点直至找到为止
+         * @param require
+         * @param $element
+         * @returns {*}
+         */
       function getControllers(require, $element) {
         var value, retrievalMethod = 'data', optional = false;
         if (isString(require)) {
@@ -4603,7 +4680,14 @@ function $CompileProvider($provide) {
         return value;
       }
 
-
+        /**
+         * link函数 设置scope(主要为isolated scope)，实例化controller，执行preLink，执行childLink，最后执行postLink
+         * @param childLinkFn 子节点上的link函数
+         * @param scope 当前节点的scope
+         * @param linkNode
+         * @param $rootElement
+         * @param boundTranscludeFn
+         */
       function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn) {
         var attrs, $element, i, ii, linkFn, controller;
 
@@ -4618,7 +4702,9 @@ function $CompileProvider($provide) {
           var LOCAL_REGEXP = /^\s*([@=&])\s*(\w*)\s*$/;
 
           var parentScope = scope.$parent || scope;
-
+            /**
+             * 如果设置了isolated scope
+              */
           forEach(newIsolateScopeDirective.scope, function(definiton, scopeName) {
             var match = definiton.match(LOCAL_REGEXP) || [],
                 attrName = match[2]|| scopeName,
@@ -4629,7 +4715,9 @@ function $CompileProvider($provide) {
             scope.$$isolateBindings[scopeName] = mode + attrName;
 
             switch (mode) {
-
+            /**
+             * @监听父scope的属性值
+             */
               case '@': {
                 attrs.$observe(attrName, function(value) {
                   scope[scopeName] = value;
@@ -4711,7 +4799,11 @@ function $CompileProvider($provide) {
             $exceptionHandler(e, startingTag($element));
           }
         }
-
+            /**
+             * 在执行子节点上的link时传入了transcludeFn，这样子节点就可以获取到该transcludeFn的link，执行transcludeFn
+             * 就可以获取到编译连接完成后的新节点 通过ng-transclude directive就可以将新节点append到相应的子节点上
+             */
+            //TODO 做测试是否所有的子节点都可以获取到该transcludeFn
         // RECURSION
         childLinkFn && childLinkFn(scope, linkNode.childNodes, undefined, boundTranscludeFn);
 
@@ -4745,6 +4837,18 @@ function $CompileProvider($provide) {
      */
         /**
          *
+         * @param tDirectives
+         * @param name
+         * @param location
+         * @param maxPriority
+         * @returns {boolean}
+         */
+        /**
+         * 查看给定的directive name
+         * 1)是否有注册的direcitive factory
+         * 2)directive的priority是否小于给定的maxPriority
+         * 3)restrict是否合法
+         * 如果合法则将其push到tDirectives数组
          * @param tDirectives
          * @param name
          * @param location
@@ -4807,7 +4911,20 @@ function $CompileProvider($provide) {
       });
     }
 
-
+        /**
+         * 异步获取template后执行link函数
+         * 基本过程与template的逻辑处理一致，不同的是templateUrl会编译整个替换后节点
+         * 在返回的link函数里会将当前节点的信息放到一个closure队列中，
+         * 这样http.$get执行success时将队列中的节点信息取出来完成link
+         * @param directives
+         * @param beforeTemplateNodeLinkFn
+         * @param $compileNode
+         * @param tAttrs
+         * @param $rootElement
+         * @param replace
+         * @param childTranscludeFn
+         * @returns {Function}
+         */
     function compileTemplateUrl(directives, beforeTemplateNodeLinkFn, $compileNode, tAttrs,
         $rootElement, replace, childTranscludeFn) {
       var linkQueue = [],
@@ -4846,6 +4963,9 @@ function $CompileProvider($provide) {
           }
 
           directives.unshift(derivedSyncDirective);
+              /**
+               * 因为templateUrl的directive在编译时不会执行compile过程，这里就需要完成在同步编译阶段未做的编译工作
+               */
           afterTemplateNodeLinkFn = applyDirectivesToNode(directives, compileNode, tAttrs, childTranscludeFn);
           afterTemplateChildLinkFn = compileNodes($compileNode[0].childNodes, childTranscludeFn);
 
@@ -4874,12 +4994,18 @@ function $CompileProvider($provide) {
         });
 
       return function delayedNodeLinkFn(ignoreChildLinkFn, scope, node, rootElement, controller) {
+          /**
+           * 将节点信息放到队列中，http.$get执行完成后就可以从该队列中取出信息完成编译
+           */
         if (linkQueue) {
           linkQueue.push(scope);
           linkQueue.push(node);
           linkQueue.push(rootElement);
           linkQueue.push(controller);
         } else {
+            /**
+             * 这种是用于 http.$get在执行到return时很快已经返回即完成template功能时（很快其中一个原因是直接从template cache找到返回了）执行
+             */
           afterTemplateNodeLinkFn(function() {
             beforeTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, node, rootElement, controller);
           }, scope, node, rootElement, controller);
@@ -4922,7 +5048,13 @@ function $CompileProvider($provide) {
       }
     }
 
-
+        /**
+         * 如果attr的value中有包含表达式{{}},作为一种特殊的directive处理
+         * @param node
+         * @param directives
+         * @param value
+         * @param name
+         */
     function addAttrInterpolateDirective(node, directives, value, name) {
       var interpolateFn = $interpolate(value, true);
 

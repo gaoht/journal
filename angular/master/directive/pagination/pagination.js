@@ -10,10 +10,10 @@ angular.module("directives", []).directive("pagination", function(){
             '<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>' +
             '<li ng-repeat="page in pages" ng-class="{active: isActive(page)}"><a ng-click="selectPage(page)">{{page}}</a></li>' +
             '<li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>' +
-            '</ul>' +
+            '</ul><input ng-model="numPages">' +
             '</div>',
         replace: true,
-        link: function(scope){
+        link: function(scope, element, attrs){
             scope.$watch('numPages', function(value){
                 var pages = scope.pages = [];
                 for(var i=1; i<=value; i++){

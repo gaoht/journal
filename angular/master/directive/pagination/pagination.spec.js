@@ -6,7 +6,8 @@ describe("directives", function(){
         $scope.numPages = 5;
         $scope.currentPage = 3;
         $scope.selectPageHandler = jasmine.createSpy('selectPageHandler');
-        element = $compile('<pagination num-pages="{{numPages}}" current-page="currentPage" on-select-page="selectPageHandler(page)"></pagination>')($scope);
+        var compile = $compile('<pagination num-pages="{{numPages}}" current-page="currentPage" on-select-page="selectPageHandler(page)"></pagination>');
+        element = compile($scope);
         $scope.$digest();
         lis = function(){ return element.find('li'); }
     }));
@@ -32,8 +33,9 @@ describe("directives", function(){
         var prevPageItem = lis().eq(0);
         expect(prevPageItem.hasClass('disabled')).toBe(true);
     });
-    it("current page changed if a page link is clicked", function(){
+    iit("current page changed if a page link is clicked", function(){
         var page3 = lis().eq(3).find('a').eq(0);
+        console.log(element.css("display"))
         page3.click();
         $scope.$digest();
         expect($scope.currentPage).toBe(3);

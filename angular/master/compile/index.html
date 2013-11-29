@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Document</title>
+    <script src="../../resources/angular/comment/angular.js"></script>
+</head>
+<body>
+    <script>
+        window.onload = function(){
+            var injector = angular.injector(['ng']);
+            injector.invoke(function($compile, $rootScope){
+                var linkFunc = $compile('<form><input ng-model="email"/>{{email}}</form>');
+                var scope = $rootScope.$new();
+                scope.email = 'abc@abc.com';
+                document.body.appendChild(linkFunc(scope)[0]);
+                scope.$apply();
+            });
+        }
+    </script>
+</body>
+
+</html>
