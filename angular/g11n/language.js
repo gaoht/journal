@@ -6,17 +6,20 @@ angular.module('G11N', []).factory('Lang', function($http, $q){
             languagePack[index] = {};
             if(languagePack.length === 3){
                 defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
+                languagePack = [];
             }
         }else{
             $http.get(url).success(function(a){
                 languagePack[index] = a;
                 if(languagePack.length === 3){
                     defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
+                    languagePack = [];
                 }
             }).error(function(){
                 languagePack[index] = {};
                 if(languagePack.length === 3){
                     defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
+                    languagePack = [];
                 }
             });
         }
