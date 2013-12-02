@@ -16,10 +16,12 @@
     <script>
         angular.module('app', ['G11N']).run(['$rootScope', 'Lang', function($rootScope, Lang){
             Lang.loadLanguage('zh_CN').then(function(language){
+                console.log(language);
                 $rootScope.localeBundle = language;
             });
             $rootScope.change = function(){
                 Lang.loadLanguage($rootScope.language).then(function(language){
+                    console.log(language);
                     $rootScope.localeBundle = language;
                 });
             }
