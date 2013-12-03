@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Document</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="../resources/jquery/jquery-1.10.2.js"></script>
+    <script src="../resources/angular/angular.js"></script>
     <script src="language.js"></script>
+    <script src="localerule.js"></script>
 </head>
 <body ng-app="app">
     <input type="text" ng-model="language">
@@ -14,7 +15,12 @@
         {{ localeBundle.loginPage.submit }} {{ localeBundle.mainPage.help }}{{ localeBundle.loginPage.psw }}
     </div>
     <script>
-        angular.module('app', ['G11N']).run(['$rootScope', 'Lang', function($rootScope, Lang){
+        angular.module('app', ['G11N'], function(LangProvider){
+            LangProvider.localeFolder('locale');
+            LangProvider.localeFilePrefix('lang');
+            LangProvider.localeFileExtension('txt');
+            LangProvider.baseLocaleName('base');
+        }).run(['$rootScope', 'Lang', function($rootScope, Lang){
             Lang.loadLanguage('zh_CN').then(function(language){
                 console.log(language);
                 $rootScope.localeBundle = language;

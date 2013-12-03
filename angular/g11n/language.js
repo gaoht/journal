@@ -1,60 +1,106 @@
-angular.module('G11N', []).factory('Lang', function($http, $q){
-    var service = {};
-    languagePack = {
-        length: 0
+angular.module('G11N', []).provider('Lang', function(){
+    var localeFolder = 'nls';
+    var localeFilePrefix = "locale";
+    var localeFileExtension = "json";
+    var baseLocaleName = "locale";
+    var localeRule = {};
+    /**
+     * set the localized bundles resource folder
+     * @param folder{String}
+     */
+    this.localeFolder = function(folder){
+        localeFolder = folder || localeFolder;
     };
-    function loadLanguages(url, index, defer){
-        if(!url){
-            languagePack[index] = {};
-            languagePack.length++;
-            if(languagePack.length === 3){
-                defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
-                languagePack = { length: 0 };
-            }
-        }else{
-            $http.get(url).success(function(a){
-                languagePack[index] = a;
-                languagePack.length++;
-                if(languagePack.length === 3){
-                    defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
-                    languagePack = { length: 0 };
+    /**
+     * set the localized file name prefix
+     * @param prefix{String}
+     */
+    this.localeFilePrefix = function(prefix){
+        localeFilePrefix = prefix || localeFilePrefix;
+    };
+    /**
+     * set the localized file extension
+     * @param ext{String}
+     */
+    this.localeFileExtension = function(ext){
+        localeFileExtension = ext || localeFileExtension;
+    };
+    /**
+     * set the base locale file name
+     * @param name{String}
+     */
+    this.baseLocaleName = function(name){
+        baseLocaleName = name || baseLocaleName;
+    }
+    /**
+     * set the locale rule
+     * @param name{String}
+     */
+    this.localeRule = function(rule){
+        localeRule = rule || localeRule;
+    }
+
+    this.$get = ['$http', '$q',
+        function($http, $q){
+        var service = {
+            rule: localeRule
+        },  languagePack = {
+            length: 0
+        };
+        /**
+         * load specified language resource
+         * @param lang
+         * @returns {promise}
+         */
+        service.loadLanguage = function(lang){
+            var languageUrl = [],
+            defer = $q.defer();
+            rule = service.rule[lang];
+            //convert '-' to '_'
+            lang && (lang = lang.replace("-", "_"));
+            languageUrl.push(localeFolder + "/" + baseLocaleName + "." +localeFileExtension);
+            if(service.rule[lang]){
+                for(var i=rule.length-1; i>=0; i--){
+                    languageUrl.push(getFilePath(service.rule[lang][i]));
                 }
-            }).error(function(){
+            }
+            while(languageUrl.length < 3){
+                languageUrl.push(false);
+            }
+            angular.forEach(languageUrl, function(url, i){
+                loadLanguages(url, i, defer);
+            });
+            return defer.promise;
+        };
+        function loadLanguages(url, index, defer){
+            if(!url){
                 languagePack[index] = {};
                 languagePack.length++;
                 if(languagePack.length === 3){
                     defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
                     languagePack = { length: 0 };
                 }
-            });
-        }
-    }
-    service.rule = {
-        zh_CN: ['zh_CN', 'zh'],
-        zh_TW: ['zh_TW', 'zh'],
-        fr_CA: ['fr_CA', 'fr']
-    };
-    service.addRule = function(rule){
-        service.rule.push(rule);
-    };
-    service.loadLanguage = function(lang){
-        lang && (lang = lang.replace("-", "_"));
-        var languagePack = [];
-        var defer = $q.defer();
-        var rule = service.rule[lang];
-        languagePack.push("nls/locale.json");
-        if(service.rule[lang]){
-            for(var i=rule.length-1; i>=0; i--){
-                languagePack.push("nls/locale_"+rule[i]+".json");
+            }else{
+                $http.get(url).success(function(a){
+                    languagePack[index] = a;
+                    languagePack.length++;
+                    if(languagePack.length === 3){
+                        defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
+                        languagePack = { length: 0 };
+                    }
+                }).error(function(){
+                        languagePack[index] = {};
+                        languagePack.length++;
+                        if(languagePack.length === 3){
+                            defer.resolve($.extend(true, {}, languagePack[0], languagePack[1], languagePack[2]));
+                            languagePack = { length: 0 };
+                        }
+                    });
             }
         }
-        while(languagePack.length < 3){
-            languagePack.push(false);
+        function getFilePath(language){
+            return localeFolder + "/" + localeFilePrefix + "_" + language + "." + localeFileExtension;
         }
-        angular.forEach(languagePack, function(url, i){
-            loadLanguages(url, i, defer);
-        });
-        return defer.promise;
-    };
-    return service;
+        return service;
+   }];
 })
