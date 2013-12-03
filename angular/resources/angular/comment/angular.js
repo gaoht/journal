@@ -4528,6 +4528,7 @@ function $CompileProvider($provide) {
            * 如果transclusion的值设置为非'element'且值为true则会将当前节点内容清空，并将当前节点的内容作为模版编译
            * 编译后的结果保存在childTranscludeFn
            * 这样在link阶段如果发现link函数上有transcludeFn则新创建一个scope继承其父scope 完成transclude的link工作
+           *
            */
         if (directiveValue = directive.transclude) {
           assertNoDuplicate('transclusion', transcludeDirective, directive, $compileNode);
@@ -14439,6 +14440,7 @@ var ngRepeatDirective = ngDirective({
           childScope.$middle = !(childScope.$first || childScope.$last);
           //新增的item都需要执行link，链接new的scop与clone模板，并将新的item放nextOrder中，用于下次watch的比对
           if (!last) {
+              //linker第一个参数为新的scope， 第二个为链接后的新element
             linker(childScope, function(clone){
               cursor.after(clone);
               last = {
