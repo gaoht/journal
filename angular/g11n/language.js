@@ -55,11 +55,11 @@ angular.module('G11N', []).provider('Lang', function(){
         service.loadLanguage = function(lang){
             var languageUrl = [],
             defer = $q.defer();
-            rule = service.rule[lang];
-            //convert '-' to '_'
+             //convert '-' to '_'
             lang && (lang = lang.replace("-", "_"));
+            rule = service.rule[lang];
             languageUrl.push(localeFolder + "/" + baseLocaleName + "." +localeFileExtension);
-            if(service.rule[lang]){
+            if(rule){
                 for(var i=rule.length-1; i>=0; i--){
                     languageUrl.push(getFilePath(service.rule[lang][i]));
                 }
