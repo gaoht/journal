@@ -14335,6 +14335,10 @@ var ngRepeatDirective = ngDirective({
   terminal: true,
   compile: function(element, attr, linker) {
     return function(scope, iterStartElement, attr){
+        /**
+         * ng-repeat的合法表达式
+         * (key, value) in collection
+         */
       var expression = attr.ngRepeat;
       var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
         lhs, rhs, valueIdent, keyIdent;
@@ -14359,6 +14363,8 @@ var ngRepeatDirective = ngDirective({
       //   - index: position
       // We need an array of these objects since the same object can be returned from the iterator.
       // We expect this to be a rare case.
+      //lastOrder 保存了上次watch运行的结果
+      //这样如果有新增或者删除item就可以在上次的dom上操作 不用再重新加载整个dom
       var lastOrder = new HashQueueMap();
 
       scope.$watch(function ngRepeatWatch(scope){
@@ -14375,7 +14381,7 @@ var ngRepeatDirective = ngDirective({
             last;       // last object information {scope, element, index}
 
 
-
+         //如果collection是个object则将其转为数组并排序，key以$打头的会被过滤掉
         if (!isArray(collection)) {
           // if object, extract keys, sort them and use to determine order of iteration over obj props
           array = [];
@@ -14395,10 +14401,12 @@ var ngRepeatDirective = ngDirective({
         for (index = 0, length = array.length; index < length; index++) {
           key = (collection === array) ? index : array[index];
           value = collection[key];
-
+          //查看上次watch运行的结果是否已经存在
+          //如果不存在则说明是新增的item
+          //如果存在需要判断是不是改变了位置（使用index标记 是否有新增或者删除条目）
           last = lastOrder.shift(value);
 
-          if (last) {
+            if (last) {
             // if we have already seen this object, then we need to reuse the
             // associated scope/element
             childScope = last.scope;
@@ -14413,6 +14421,7 @@ var ngRepeatDirective = ngDirective({
               // This may be a noop, if the element is next, but I don't know of a good way to
               // figure this out,  since it would require extra DOM access, so let's just hope that
               // the browsers realizes that it is noop, and treats it as such.
+              //after会将已存在的item移到last.element后
               cursor.after(last.element);
               cursor = last.element;
             }
@@ -14428,7 +14437,7 @@ var ngRepeatDirective = ngDirective({
           childScope.$first = (index === 0);
           childScope.$last = (index === arrayBound);
           childScope.$middle = !(childScope.$first || childScope.$last);
-
+          //新增的item都需要执行link，链接new的scop与clone模板，并将新的item放nextOrder中，用于下次watch的比对
           if (!last) {
             linker(childScope, function(clone){
               cursor.after(clone);
@@ -14443,6 +14452,7 @@ var ngRepeatDirective = ngDirective({
         }
 
         //shrink children
+        //有被移除的item 从dom中删除并且destroy掉scope
         for (key in lastOrder) {
           if (lastOrder.hasOwnProperty(key)) {
             array = lastOrder[key];
