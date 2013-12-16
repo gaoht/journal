@@ -1,0 +1,16 @@
+{
+    "loginPage":{
+      "title":"組員管理系統",
+      "uname":"用戶名",
+      "psw":"密碼",
+      "rememberMe":"記住密碼",
+      "submit":"提交"
+    },
+    "mainPage":{
+      "help":"幫助",
+      "signout":"退出",
+      "administrator":"管理員",
+      "template":"模版",
+      "projects":"項目"
+    }
+  }

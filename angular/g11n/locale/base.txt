@@ -1,0 +1,13 @@
+{
+    "loginPage":{
+      "title":"Team Manage System",
+      "uname":"User Name",
+      "psw":"Password",
+      "rememberMe":"Remember me",
+      "submit":"Submit"
+    },
+    "mainPage":{
+      "help":"Help",
+      "Signout":"Sign Out"
+    }
+  }

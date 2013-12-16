@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Document</title>
+    <script src="../../resources/jquery/jquery-1.10.2.js"></script>
+    <script src="../../resources/angular/comment/angular.js"></script>
+</head>
+<body>
+    <script>
+        function ngModel(){
+            var injector = angular.injector(['ng']);
+            injector.invoke(function($compile, $rootScope){
+                var linkFunc = $compile('<form><input ng-model="email"/>{{email}}</form>');
+                var scope = $rootScope.$new();
+                scope.email = 'abc@abc.com';
+                document.body.appendChild(linkFunc(scope)[0]);
+                scope.$apply();
+            });
+        }
+        function ngRepeat(){
+            var injector = angular.injector(['ng']);
+            injector.invoke(function($compile, $rootScope){
+                var linkFunc = $compile("<div ng-repeat='item in items'>{{ item }}</div>");
+                var scope = $rootScope.$new();
+                scope.items = [1,2,3];
+                debugger;
+                $('body').append(linkFunc(scope));
+                debugger;
+                scope.$apply();
+            });
+        }
+        window.onload = function(){
+            ngRepeat();
+        }
+    </script>
+</body>
+
+</html>

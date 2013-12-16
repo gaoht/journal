@@ -1,0 +1,10 @@
+{
+    "loginPage":{
+      "title":"组员管理系统",
+      "uname":"用户名",
+      "rememberMe":"记住密码"
+    },
+    "mainPage":{
+      "help":"帮助"
+    }
+  }

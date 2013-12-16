@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Document</title>
+    <script src="../resources/jquery/jquery-1.10.2.js"></script>
+    <script src="../resources/angular/angular.js"></script>
+    <script src="language.js"></script>
+    <script src="localerule.js"></script>
+</head>
+<body ng-app="app">
+    <input type="text" ng-model="language">
+    <button ng-click="change()">Change</button>
+    <div>
+        {{ localeBundle.loginPage.submit }} {{ localeBundle.mainPage.help }}{{ localeBundle.loginPage.psw }}
+    </div>
+    <script>
+        angular.module('app', ['G11N'], function(LangProvider){
+            LangProvider.localeFolder('locale');
+            LangProvider.localeFilePrefix('lang');
+            LangProvider.localeFileExtension('txt');
+            LangProvider.baseLocaleName('base');
+        }).run(['$rootScope', 'Lang', function($rootScope, Lang){
+            Lang.loadLanguage('zh_CN').then(function(language){
+                console.log(language);
+                $rootScope.localeBundle = language;
+            });
+            $rootScope.change = function(){
+                Lang.loadLanguage($rootScope.language).then(function(language){
+                    console.log(language);
+                    $rootScope.localeBundle = language;
+                });
+            }
+        }]);
+    </script>
+</body>
+</html>

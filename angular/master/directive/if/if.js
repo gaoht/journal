@@ -16,7 +16,7 @@ angular.module("directives", [] ).directive('if', function(){
                             element.after(clone);
                         })
                     }
-                });;
+                });
             }
         }
     }
