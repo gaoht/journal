@@ -8,7 +8,7 @@
     <script src="pagination.js"></script>
 </head>
 <body ng-controller="bodyCtrl">
-    <pagination num-pages="{{page.numPages}}" current-page="page.currentPage" on-select-page="selectPageHandler(page)"></pagination>
+    <pagination num-pages="{{page.numPages}}" current-page="page.currentPage" on-select-page="selectPageHandler(page)" ng-controller="pageCtrl"></pagination>
     <div>Number of Pages: <input ng-model="page.numPages" type="number"></div>
     <div>Current Page: <input ng-model="page.currentPage"  type="number"></div>
     <div>Count of Page Selections: {{selectCount}}</div>
@@ -21,6 +21,9 @@
         $scope.selectPageHandler = function(page){
             $scope.selectCount++;
         }
+    }
+    function pageCtrl($scope){
+        $scope.numPages = 10;
     }
 </script>
 </body>
